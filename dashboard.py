@@ -9,6 +9,11 @@ import pandas as pd
 import re
 import numpy as np
 import re
+import smtplib
+# Import the email modules we'll need
+from email.mime.text import MIMEText
+
+
 from openpyxl import load_workbook
 
 from io import BytesIO
@@ -206,6 +211,7 @@ def update_clinic_dashbaords(dest,updated_dest, clinic_name, reporting_year):
 output = BytesIO()
 dest = "./static/2022-IAFCC-Master-Dashboard copy.xlsx"
 updated_dest = "./static/IAFCC-FCC-Template-Dashboard-test.xlsx"
+name = st.text_input('Enter your email here: ', 'abc@gmail.com')
 spectra = st.file_uploader("Upload your clinic's data here!", type={"csv", "xlsx"})
 reporting_year = 2022
 if spectra is not None:
@@ -237,8 +243,33 @@ if spectra is not None:
 	with open(updated_dest, 'rb') as f:
    		st.download_button('Download File', f, file_name='test.xlsx')  # Defaults to 'application/octet-stream'
 
+    # Open a plain text file for reading.  For this example, assume that
+    # the text file contains only ASCII characters.
+    gmail_user = 'fccdashboardserver@gmail.com'
+    gmail_password = 'FCCDashbord12345!'
 
+    sent_from = gmail_user
+    to = ['alansoetikno@gmail.com']
+    subject = 'Lorem ipsum dolor sit amet'
+    body = 'consectetur adipiscing elit'
 
+    email_text = """\
+    From: %s
+    To: %s
+    Subject: %s
+
+    %s
+    """ % (sent_from, ", ".join(to), subject, body)
+
+    try:
+        smtp_server = smtplib.SMTP_SSL('smtp.gmail.com', 465)
+        smtp_server.ehlo()
+        smtp_server.login(gmail_user, gmail_password)
+        smtp_server.sendmail(sent_from, to, email_text)
+        smtp_server.close()
+        print ("Email sent successfully!")
+    except Exception as ex:
+        print ("Something went wrong….",ex)
 
 # st.write(
 #     f'<span style="font-size: 78px; line-height: 1">🐱</span>',
