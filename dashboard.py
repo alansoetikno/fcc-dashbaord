@@ -12,8 +12,8 @@ import re
 from openpyxl import load_workbook
 
 from io import BytesIO
-with st.echo():
-    st.markdown("[![Click me](./static/second opinions website-logo-2018-small.png)](https://www.second-opinions.org/home)")
+# with st.echo():
+st.markdown("[![Click me](./static/second opinions website-logo-2018-small.jpg)](https://www.second-opinions.org/home)")
 
 def clear_sheet(sheet):
     for row in sheet:
