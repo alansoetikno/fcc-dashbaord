@@ -245,31 +245,31 @@ if spectra is not None:
 
     # Open a plain text file for reading.  For this example, assume that
     # the text file contains only ASCII characters.
-    gmail_user = 'fccdashboardserver@gmail.com'
-    gmail_password = 'FCCDashbord12345!'
+    # gmail_user = 'fccdashboardserver@gmail.com'
+    # gmail_password = 'FCCDashbord12345!'
 
-    sent_from = gmail_user
-    to = ['alansoetikno@gmail.com']
-    subject = 'Lorem ipsum dolor sit amet'
-    body = 'consectetur adipiscing elit'
+    # sent_from = gmail_user
+    # to = ['alansoetikno@gmail.com']
+    # subject = 'Lorem ipsum dolor sit amet'
+    # body = 'consectetur adipiscing elit'
 
-    email_text = """\
-    From: %s
-    To: %s
-    Subject: %s
+    # email_text = """\
+    # From: %s
+    # To: %s
+    # Subject: %s
 
-    %s
-    """ % (sent_from, ", ".join(to), subject, body)
+    # %s
+    # """ % (sent_from, ", ".join(to), subject, body)
 
-    try:
-        smtp_server = smtplib.SMTP_SSL('smtp.gmail.com', 465)
-        smtp_server.ehlo()
-        smtp_server.login(gmail_user, gmail_password)
-        smtp_server.sendmail(sent_from, to, email_text)
-        smtp_server.close()
-        print ("Email sent successfully!")
-    except Exception as ex:
-        print ("Something went wrong….",ex)
+    # try:
+    #     smtp_server = smtplib.SMTP_SSL('smtp.gmail.com', 465)
+    #     smtp_server.ehlo()
+    #     smtp_server.login(gmail_user, gmail_password)
+    #     smtp_server.sendmail(sent_from, to, email_text)
+    #     smtp_server.close()
+    #     print ("Email sent successfully!")
+    # except Exception as ex:
+    #     print ("Something went wrong….",ex)
 
 # st.write(
 #     f'<span style="font-size: 78px; line-height: 1">🐱</span>',
