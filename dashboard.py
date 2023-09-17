@@ -13,8 +13,8 @@ from openpyxl import load_workbook
 
 from io import BytesIO
 # with st.echo():
-st.markdown("[![Click me](./static/second opinions website-logo-2018-small.jpg)](https://www.second-opinions.org/home)")
-
+st.markdown("[![Click me](./app/static/logo-2018-small.jpg)](https://www.second-opinions.org/home)")
+st.title("Welcome to Second Opinion's Free clinic dashboard creator!")
 def clear_sheet(sheet):
     for row in sheet:
         sheet.delete_rows(1, sheet.max_row+1)
@@ -206,7 +206,7 @@ def update_clinic_dashbaords(dest,updated_dest, clinic_name, reporting_year):
 output = BytesIO()
 dest = "./static/2022-IAFCC-Master-Dashboard copy.xlsx"
 updated_dest = "./static/IAFCC-FCC-Template-Dashboard-test.xlsx"
-spectra = st.file_uploader("upload file", type={"csv", "xlsx"})
+spectra = st.file_uploader("Upload your clinic's data here!", type={"csv", "xlsx"})
 reporting_year = 2022
 if spectra is not None:
 	
