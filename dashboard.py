@@ -13,7 +13,7 @@ from openpyxl import load_workbook
 
 from io import BytesIO
 # with st.echo():
-st.markdown("[![Click me](./static/logo-2018-small.jpg)](https://www.second-opinions.org/home)")
+st.markdown("[![Click me](./app/static/logo-2018-small.jpg)](https://www.second-opinions.org/home)")
 st.title("Welcome to Second Opinion's Free clinic dashboard creator!")
 def clear_sheet(sheet):
     for row in sheet:
