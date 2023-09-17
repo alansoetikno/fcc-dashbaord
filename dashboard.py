@@ -13,7 +13,7 @@ from openpyxl import load_workbook
 
 from io import BytesIO
 
-
+st.markdown("[![Click me](./app/static/second opinions website-logo-2018-small.png)](https://www.second-opinions.org/home)")
 def clear_sheet(sheet):
     for row in sheet:
         sheet.delete_rows(1, sheet.max_row+1)
@@ -275,7 +275,7 @@ if spectra is not None:
 # """
 
 # with st.echo():
-st.markdown("[![Click me](./app/static/cat.jpg)](https://streamlit.io)")
+# st.markdown("[![Click me](./app/static/cat.jpg)](https://streamlit.io)")
 
 # """
 # Or you can use images in HTML or SVG:
