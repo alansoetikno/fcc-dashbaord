@@ -238,7 +238,8 @@ if spectra is not None:
 		final_path = dashboard_folder_path + str(reporting_year) + "-" + clinic + " dashboard.xlsx"
 		update_clinic_dashbaords(updated_dest, final_path, clinic, reporting_year)
 		with open(final_path, 'rb') as f:
-			st.download_button('Download:' + str(clinic), f, file_name=str(clinic) + '.xlsx')  # Defaults to 'application/octet-stream'
+            st.text(str(clinic))
+			st.download_button('Download:', f, file_name=str(clinic) + '.xlsx')  # Defaults to 'application/octet-stream'
 
 	# # Open a plain text file for reading.  For this example, assume that
 	# # the text file contains only ASCII characters.
