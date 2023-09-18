@@ -16,7 +16,6 @@ from email.mime.text import MIMEText
 
 from openpyxl import load_workbook
 
-from io import BytesIO
 # with st.echo():
 st.markdown("[![Click me](./app/static/logo-2018-small.jpg)](https://www.second-opinions.org/home)")
 st.title("Welcome to Second Opinion's Free clinic dashboard creator!")
@@ -206,56 +205,83 @@ def update_clinic_dashbaords(dest,updated_dest, clinic_name, reporting_year):
 	wb.save(updated_dest)
 
 
+def check_password():
+	"""Returns `True` if the user had the correct password."""
+
+	def password_entered():
+		"""Checks whether a password entered by the user is correct."""
+		if st.session_state["password"] == st.secrets["password"]:
+			st.session_state["password_correct"] = True
+			del st.session_state["password"]  # don't store password
+		else:
+			st.session_state["password_correct"] = False
+
+	if "password_correct" not in st.session_state:
+		# First run, show input for password.
+		st.text_input(
+			"Password", type="password", on_change=password_entered, key="password"
+		)
+		return False
+	elif not st.session_state["password_correct"]:
+		# Password not correct, show input + error.
+		st.text_input(
+			"Password", type="password", on_change=password_entered, key="password"
+		)
+		st.error("😕 Password incorrect")
+		return False
+	else:
+		# Password correct.
+		return True
+
+if check_password():
+
+	dest = "./static/2022-IAFCC-Master-Dashboard-source.xlsx"
+	updated_dest = "./static/IAFCC-FCC-Template-Dashboard-test.xlsx"
+	dashboard_folder_path = "./static/"
+	name = st.text_input('Enter your email here: ', 'abc@gmail.com')
+	spectra = st.file_uploader("Upload your clinic's data here! (*max 1000 clinics*)", type={"csv", "xlsx"})
+	reporting_year = 2022
+	if spectra is not None:
+		clean_source_wb = load_workbook(spectra)
+		clean_source_ws = clean_source_wb.active
+		st.write("Completed upload")
+		wb = load_workbook(filename = dest)
+		wb = copy_paste_cleaned_data(wb, 'Cleaned Responses',clean_source_ws, reporting_year = reporting_year)
+		wb = clean_data(wb,"Cleaned Responses")
+		clinic_list = pull_clinic_list(wb['Cleaned Responses'], reporting_year)
+		# wb['Raw Model Inputs'].delete_columns(1,1)
+		mr = wb['Raw Model Inputs'].max_row
+		# remove unneccesary rwos
+		# add in appropriate data from uploaded sheet
+		# for loop must go in reverse to prevent skipping rows in excel (as index moves when you remove rows)
+		for i in range(1000,-1,-1):
+
+			if i <len(clinic_list):
+				print(clinic_list[i])
+				wb['Raw Model Inputs'].cell(row = i+2, column = 1).value = clinic_list[i]
+				wb['Raw Model Inputs'].cell(row = i+2, column = 2).value = reporting_year
+			else: 
+				wb['Raw Model Inputs'].delete_rows(idx=i+2)
 
 
-output = BytesIO()
-dest = "./static/2022-IAFCC-Master-Dashboard-source.xlsx"
-updated_dest = "./static/IAFCC-FCC-Template-Dashboard-test.xlsx"
-dashboard_folder_path = "./static/"
-name = st.text_input('Enter your email here: ', 'abc@gmail.com')
-spectra = st.file_uploader("Upload your clinic's data here! (*max 1000 clinics*)", type={"csv", "xlsx"})
-reporting_year = 2022
-if spectra is not None:
-	clean_source_wb = load_workbook(spectra)
-	clean_source_ws = clean_source_wb.active
-	st.write("Completed upload")
-	wb = load_workbook(filename = dest)
-	wb = copy_paste_cleaned_data(wb, 'Cleaned Responses',clean_source_ws, reporting_year = reporting_year)
-	wb = clean_data(wb,"Cleaned Responses")
-	clinic_list = pull_clinic_list(wb['Cleaned Responses'], reporting_year)
-	# wb['Raw Model Inputs'].delete_columns(1,1)
-	mr = wb['Raw Model Inputs'].max_row
-    # remove unneccesary rwos
-    # add in appropriate data from uploaded sheet
-    # for loop must go in reverse to prevent skipping rows in excel (as index moves when you remove rows)
-	for i in range(1000,-1,-1):
+		# for i in range(10000,1):
+		# 	print("the max row is :" + str(mr))
+		# 	# print(wb['Raw Model Inputs'])
+		# 	# print(wb['Raw Model Inputs'][1])
+		# 	if wb['Raw Model Inputs'].cell(row = i+1, column = 1).value == 'remove':
+		# 		print(i)
+				
 
-		if i <len(clinic_list):
-			print(clinic_list[i])
-			wb['Raw Model Inputs'].cell(row = i+2, column = 1).value = clinic_list[i]
-			wb['Raw Model Inputs'].cell(row = i+2, column = 2).value = reporting_year
-		else: 
-			wb['Raw Model Inputs'].delete_rows(idx=i+2)
-
-
-	# for i in range(10000,1):
-	# 	print("the max row is :" + str(mr))
-	# 	# print(wb['Raw Model Inputs'])
-	# 	# print(wb['Raw Model Inputs'][1])
-	# 	if wb['Raw Model Inputs'].cell(row = i+1, column = 1).value == 'remove':
-	# 		print(i)
-			
-
-	wb['0. Dashboard']["I12"].value = reporting_year
-	wb.save(updated_dest)
-	with open(updated_dest, 'rb') as f:
-		st.download_button('Download File', f, file_name='test.xlsx')  # Defaults to 'application/octet-stream'
-	for clinic in clinic_list:
-		final_path = dashboard_folder_path + str(reporting_year) + "-" + clinic + " dashboard.xlsx"
-		update_clinic_dashbaords(updated_dest, final_path, clinic, reporting_year)
-		with open(final_path, 'rb') as f:
-			st.text(str(clinic))
-			st.download_button('Download', f, file_name=str(clinic) + '.xlsx')  # Defaults to 'application/octet-stream'
+		wb['0. Dashboard']["I12"].value = reporting_year
+		wb.save(updated_dest)
+		with open(updated_dest, 'rb') as f:
+			st.download_button('Download File', f, file_name='test.xlsx')  # Defaults to 'application/octet-stream'
+		for clinic in clinic_list:
+			final_path = dashboard_folder_path + str(reporting_year) + "-" + clinic + " dashboard.xlsx"
+			update_clinic_dashbaords(updated_dest, final_path, clinic, reporting_year)
+			with open(final_path, 'rb') as f:
+				st.text(str(clinic))
+				st.download_button('Download', f, file_name=str(clinic) + '.xlsx')  # Defaults to 'application/octet-stream'
 
 	# # Open a plain text file for reading.  For this example, assume that
 	# # the text file contains only ASCII characters.
