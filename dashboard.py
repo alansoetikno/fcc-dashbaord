@@ -209,7 +209,7 @@ def update_clinic_dashbaords(dest,updated_dest, clinic_name, reporting_year):
 
 
 output = BytesIO()
-dest = "./static/2022-IAFCC-Master-Dashboard copy.xlsx"
+dest = "./static/2022-IAFCC-Master-Dashboard-source.xlsx"
 updated_dest = "./static/IAFCC-FCC-Template-Dashboard-test.xlsx"
 dashboard_folder_path = "./static/"
 name = st.text_input('Enter your email here: ', 'abc@gmail.com')
@@ -225,11 +225,27 @@ if spectra is not None:
 	clinic_list = pull_clinic_list(wb['Cleaned Responses'], reporting_year)
 	# wb['Raw Model Inputs'].delete_columns(1,1)
 	mr = wb['Raw Model Inputs'].max_row
-	for i in range(0, mr-2):
+    # remove unneccesary rwos
+    # add in appropriate data from uploaded sheet
+    # for loop must go in reverse to prevent skipping rows in excel (as index moves when you remove rows)
+	for i in range(1000,-1,-1):
+
 		if i <len(clinic_list):
+			print(clinic_list[i])
 			wb['Raw Model Inputs'].cell(row = i+2, column = 1).value = clinic_list[i]
+			wb['Raw Model Inputs'].cell(row = i+2, column = 2).value = reporting_year
 		else: 
-			wb['Raw Model Inputs'].cell(row = i+2, column = 1).value = None
+			wb['Raw Model Inputs'].delete_rows(idx=i+2)
+
+
+	# for i in range(10000,1):
+	# 	print("the max row is :" + str(mr))
+	# 	# print(wb['Raw Model Inputs'])
+	# 	# print(wb['Raw Model Inputs'][1])
+	# 	if wb['Raw Model Inputs'].cell(row = i+1, column = 1).value == 'remove':
+	# 		print(i)
+			
+
 	wb['0. Dashboard']["I12"].value = reporting_year
 	wb.save(updated_dest)
 	with open(updated_dest, 'rb') as f:
@@ -239,7 +255,7 @@ if spectra is not None:
 		update_clinic_dashbaords(updated_dest, final_path, clinic, reporting_year)
 		with open(final_path, 'rb') as f:
 			st.text(str(clinic))
-			st.download_button('Download:', f, file_name=str(clinic) + '.xlsx')  # Defaults to 'application/octet-stream'
+			st.download_button('Download', f, file_name=str(clinic) + '.xlsx')  # Defaults to 'application/octet-stream'
 
 	# # Open a plain text file for reading.  For this example, assume that
 	# # the text file contains only ASCII characters.
