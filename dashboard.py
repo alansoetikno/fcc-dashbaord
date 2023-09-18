@@ -213,7 +213,7 @@ dest = "./static/2022-IAFCC-Master-Dashboard-source.xlsx"
 updated_dest = "./static/IAFCC-FCC-Template-Dashboard-test.xlsx"
 dashboard_folder_path = "./static/"
 name = st.text_input('Enter your email here: ', 'abc@gmail.com')
-spectra = st.file_uploader("Upload your clinic's data here!", type={"csv", "xlsx"})
+spectra = st.file_uploader("Upload your clinic's data here! (*max 1000 clinics*)", type={"csv", "xlsx"})
 reporting_year = 2022
 if spectra is not None:
 	clean_source_wb = load_workbook(spectra)
