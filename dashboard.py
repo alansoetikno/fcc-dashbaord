@@ -24,6 +24,10 @@ def clear_sheet(sheet):
 		sheet.delete_rows(1, sheet.max_row+1)
 	return sheet
 
+
+
+
+
 def copy_paste_cleaned_data(wb, target_sheet_name, source_sheet, reporting_year):
 	clear_sheet(wb[target_sheet_name])
 	target_sheet = wb[target_sheet_name]
@@ -233,55 +237,131 @@ def check_password():
 		# Password correct.
 		return True
 
+
+def copy_paste_conversions(target_wb, source_sheet):
+	reimbursment_sheet = target_wb['1. Reimbursement Value']
+	ed_sheet = target_wb['3. Diverted ED Health']
+	print("The value at D5 is  "+ str(source_sheet['D5'].value))
+	reimbursment_sheet['C29'] = source_sheet['D5'].value
+	reimbursment_sheet['C30'] = source_sheet['D6'].value	
+	reimbursment_sheet['C31'] = source_sheet['D7'].value
+	reimbursment_sheet['C33'] = source_sheet['D9'].value
+	reimbursment_sheet['C35'] = source_sheet['D11'].value
+	reimbursment_sheet['C37'] = source_sheet['D13'].value
+	reimbursment_sheet['C39'] = source_sheet['D15'].value
+	reimbursment_sheet['C40'] = source_sheet['D16'].value
+	reimbursment_sheet['C41'] = source_sheet['D17'].value
+	reimbursment_sheet['C43'] = source_sheet['D19'].value
+	reimbursment_sheet['C45'] = source_sheet['D21'].value
+	reimbursment_sheet['C47'] = source_sheet['D23'].value
+
+
+	ed_sheet['D23'] = source_sheet['D27'].value
+	ed_sheet['D28'] = source_sheet['D32'].value
+	ed_sheet['D30'] = source_sheet['D34'].value
+	return wb
+
+def click_button():
+	st.session_state.button = not st.session_state.button
+
+
+
+
 if check_password():
 
+
+
+	if 'button' not in st.session_state:
+	    st.session_state.button = False
+
+	conversion_template_file_path = "./static/fcc-dashboard-conversion-template.xlsx"
+	st.subheader('You can use default conversion rates or upload your own custom conversions.')
+	st.subheader('You can download a template conversion file here')
+	with open(conversion_template_file_path, 'rb') as f:
+		st.download_button('Download', f, file_name="fcc-dashboard-conversion-template.xlsx") 
+
+	st.button('Toggle Custom Conversion', on_click=click_button)
+
+	if st.session_state.button:
+	    # The message and nested widget will remain on the page
+	    st.write('Custom conversion on')
+	else:
+	    st.write('Custom conversion off')
+
+
 	dest = "./static/2022-IAFCC-Master-Dashboard-source.xlsx"
+	default_conversion_path = "./static/fcc-dashboard-default-conversions.xlsx"
 	updated_dest = "./static/IAFCC-FCC-Template-Dashboard-test.xlsx"
 	dashboard_folder_path = "./static/"
-	name = st.text_input('Enter your email here: ', 'abc@gmail.com')
+
+
+
+
+
+	st.text("")
 	spectra = st.file_uploader("Upload your clinic's data here! (*max 1000 clinics*)", type={"csv", "xlsx"})
 	reporting_year = 2022
 	if spectra is not None:
-		clean_source_wb = load_workbook(spectra)
-		clean_source_ws = clean_source_wb.active
-		st.write("Completed upload")
-		wb = load_workbook(filename = dest)
-		wb = copy_paste_cleaned_data(wb, 'Cleaned Responses',clean_source_ws, reporting_year = reporting_year)
-		wb = clean_data(wb,"Cleaned Responses")
-		clinic_list = pull_clinic_list(wb['Cleaned Responses'], reporting_year)
-		# wb['Raw Model Inputs'].delete_columns(1,1)
-		mr = wb['Raw Model Inputs'].max_row
-		# remove unneccesary rwos
-		# add in appropriate data from uploaded sheet
-		# for loop must go in reverse to prevent skipping rows in excel (as index moves when you remove rows)
-		for i in range(1000,-1,-1):
-
-			if i <len(clinic_list):
-				print(clinic_list[i])
-				wb['Raw Model Inputs'].cell(row = i+2, column = 1).value = clinic_list[i]
-				wb['Raw Model Inputs'].cell(row = i+2, column = 2).value = reporting_year
-			else: 
-				wb['Raw Model Inputs'].delete_rows(idx=i+2)
+		
+		if st.session_state.button:
+			conversions = st.file_uploader("Upload your conversion template here! (*max 1000 clinics*)", type={"csv", "xlsx"})
+		else:
+			conversions = default_conversion_path
+		if conversions is not None:
+			# conversions values
+			conversions_wb = load_workbook(conversions)
+			conversions_ws = conversions_wb.active
 
 
-		# for i in range(10000,1):
-		# 	print("the max row is :" + str(mr))
-		# 	# print(wb['Raw Model Inputs'])
-		# 	# print(wb['Raw Model Inputs'][1])
-		# 	if wb['Raw Model Inputs'].cell(row = i+1, column = 1).value == 'remove':
-		# 		print(i)
-				
+			# clinic data sheets
+			clean_source_wb = load_workbook(spectra)
+			clean_source_ws = clean_source_wb.active
+			st.write("Completed upload")
+			wb = load_workbook(filename = dest)
+			wb = copy_paste_cleaned_data(wb, 'Cleaned Responses',clean_source_ws, reporting_year = reporting_year)
+			wb = copy_paste_conversions(wb, conversions_ws)
+			wb = clean_data(wb,"Cleaned Responses")
 
-		wb['0. Dashboard']["I12"].value = reporting_year
-		wb.save(updated_dest)
-		with open(updated_dest, 'rb') as f:
-			st.download_button('Download File', f, file_name='test.xlsx')  # Defaults to 'application/octet-stream'
-		for clinic in clinic_list:
-			final_path = dashboard_folder_path + str(reporting_year) + "-" + clinic + " dashboard.xlsx"
-			update_clinic_dashbaords(updated_dest, final_path, clinic, reporting_year)
-			with open(final_path, 'rb') as f:
-				st.text(str(clinic))
-				st.download_button('Download', f, file_name=str(clinic) + '.xlsx')  # Defaults to 'application/octet-stream'
+
+
+
+
+
+			clinic_list = pull_clinic_list(wb['Cleaned Responses'], reporting_year)
+			# wb['Raw Model Inputs'].delete_columns(1,1)
+			mr = wb['Raw Model Inputs'].max_row
+			# remove unneccesary rwos
+			# add in appropriate data from uploaded sheet
+			# for loop must go in reverse to prevent skipping rows in excel (as index moves when you remove rows)
+			for i in range(1000,-1,-1):
+
+				if i <len(clinic_list):
+					print(clinic_list[i])
+					wb['Raw Model Inputs'].cell(row = i+2, column = 1).value = clinic_list[i]
+					wb['Raw Model Inputs'].cell(row = i+2, column = 2).value = reporting_year
+				else: 
+					wb['Raw Model Inputs'].delete_rows(idx=i+2)
+
+
+			# for i in range(10000,1):
+			# 	print("the max row is :" + str(mr))
+			# 	# print(wb['Raw Model Inputs'])
+			# 	# print(wb['Raw Model Inputs'][1])
+			# 	if wb['Raw Model Inputs'].cell(row = i+1, column = 1).value == 'remove':
+			# 		print(i)
+					
+
+			wb['0. Dashboard']["I12"].value = reporting_year
+			wb.save(updated_dest)
+			with open(updated_dest, 'rb') as f:
+				st.text("Overall Dashboard")
+				st.download_button('Download File', f, file_name='test.xlsx')  # Defaults to 'application/octet-stream'
+			for clinic in clinic_list:
+				final_path = dashboard_folder_path + str(reporting_year) + "-" + clinic + " dashboard.xlsx"
+				update_clinic_dashbaords(updated_dest, final_path, clinic, reporting_year)
+				with open(final_path, 'rb') as f:
+					st.text(str(clinic))
+					st.download_button('Download', f, file_name=str(clinic) + '.xlsx')  # Defaults to 'application/octet-stream'
 
 	# # Open a plain text file for reading.  For this example, assume that
 	# # the text file contains only ASCII characters.
