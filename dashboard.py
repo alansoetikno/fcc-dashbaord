@@ -10,11 +10,42 @@ import re
 import numpy as np
 import re
 import smtplib
+
+import zlib
+import zipfile
 # Import the email modules we'll need
 from email.mime.text import MIMEText
 
 
 from openpyxl import load_workbook
+
+
+
+
+def compress(file_paths):
+    print("File Paths:")
+    print(file_paths)
+
+    # path = "C:/data/"
+
+    # Select the compression mode ZIP_DEFLATED for compression
+    # or zipfile.ZIP_STORED to just store the file
+    compression = zipfile.ZIP_DEFLATED
+    zip_path = "./dashboard_zip.zip"
+    # create the zip file first parameter path/name, second mode
+    zf = zipfile.ZipFile("./dashboard_zip.zip", mode="w")
+    try:
+        for file_path in file_paths:
+            # Add file to the zip file
+            # first parameter file to zip, second filename in zip
+            zf.write(file_path, file_path, compress_type=compression)
+
+    except FileNotFoundError:
+        print("An error occurred")
+    finally:
+        # Don't forget to close the file!
+        zf.close()
+    return zip_path
 
 # with st.echo():
 st.markdown("[![Click me](./app/static/logo-2018-small.jpg)](https://www.second-opinions.org/home)")
@@ -268,9 +299,6 @@ def click_button():
 
 
 if check_password():
-
-
-
 	if 'button' not in st.session_state:
 	    st.session_state.button = False
 
@@ -287,16 +315,10 @@ if check_password():
 	    st.write('Custom conversion on')
 	else:
 	    st.write('Custom conversion off')
-
-
 	dest = "./static/2022-IAFCC-Master-Dashboard-source.xlsx"
 	default_conversion_path = "./static/fcc-dashboard-default-conversions.xlsx"
-	updated_dest = "./static/IAFCC-FCC-Template-Dashboard-test.xlsx"
+	updated_dest = "./static/Overall-Clinic-Dashboard.xlsx"
 	dashboard_folder_path = "./static/"
-
-
-
-
 
 	st.text("")
 	spectra = st.file_uploader("Upload your clinic's data here! (*max 1000 clinics*)", type={"csv", "xlsx"})
@@ -321,12 +343,6 @@ if check_password():
 			wb = copy_paste_cleaned_data(wb, 'Cleaned Responses',clean_source_ws, reporting_year = reporting_year)
 			wb = copy_paste_conversions(wb, conversions_ws)
 			wb = clean_data(wb,"Cleaned Responses")
-
-
-
-
-
-
 			clinic_list = pull_clinic_list(wb['Cleaned Responses'], reporting_year)
 			# wb['Raw Model Inputs'].delete_columns(1,1)
 			mr = wb['Raw Model Inputs'].max_row
@@ -353,15 +369,29 @@ if check_password():
 
 			wb['0. Dashboard']["I12"].value = reporting_year
 			wb.save(updated_dest)
-			with open(updated_dest, 'rb') as f:
-				st.text("Overall Dashboard")
-				st.download_button('Download File', f, file_name='test.xlsx')  # Defaults to 'application/octet-stream'
+			# with open(updated_dest, 'rb') as f:
+			# 	st.text("Overall Dashboard")
+			# 	st.download_button('Download File', f, file_name='test.xlsx')  # Defaults to 'application/octet-stream'
+
+			file_paths = [updated_dest]
 			for clinic in clinic_list:
 				final_path = dashboard_folder_path + str(reporting_year) + "-" + clinic + " dashboard.xlsx"
+				file_paths = file_paths + [final_path]
 				update_clinic_dashbaords(updated_dest, final_path, clinic, reporting_year)
-				with open(final_path, 'rb') as f:
-					st.text(str(clinic))
-					st.download_button('Download', f, file_name=str(clinic) + '.xlsx')  # Defaults to 'application/octet-stream'
+				
+			zip_path = compress(file_paths)
+			with open(zip_path, 'rb') as f:
+				st.text("Download All Dashboards Here:")
+				st.download_button('Download ZIP', f, file_name= 'dashboards.zip')  # Defaults to 'application/octet-stream'
+
+			for file_path in file_paths:
+				with open(file_path, 'rb') as f:
+					dashboard_name = file_path.split('/')[-1]
+					clinic_name = dashboard_name.split('.')[0]
+					print(dashboard_name)
+					st.text(str(clinic_name))
+					st.download_button('Download', f, file_name= str(dashboard_name))  # Defaults to 'application/octet-stream'
+
 
 	# # Open a plain text file for reading.  For this example, assume that
 	# # the text file contains only ASCII characters.
