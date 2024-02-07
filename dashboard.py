@@ -67,7 +67,6 @@ def copy_paste_cleaned_data(wb, target_sheet_name, source_sheet, reporting_year)
 		for j in range (1, mc + 1):
 			# reading cell value from source excel file
 			c = source_sheet.cell(row = i, column = j)
-	  
 			# writing the read value to destination excel file
 			target_sheet.cell(row = i, column = j).value = c.value
 	target_sheet.insert_cols(0)
@@ -105,6 +104,7 @@ def convert_empty_to_zero(sheet, col):
 # for example: "Approximately 150" -> should be replaced with 150
 #		 "Zero (0)" -> should be replaced with 0 
 #		 "828 - DENTAL Imaging Only" -> replaced with 828
+#        "-" -> replaced with 0 
 def find_numbers(sheet, col):
 
 	mr = sheet.max_row
@@ -323,7 +323,6 @@ if check_password():
 			# conversions values
 			conversions_wb = load_workbook(conversions)
 			conversions_ws = conversions_wb.active
-
 
 			# clinic data sheets
 			clean_source_wb = load_workbook(spectra)
