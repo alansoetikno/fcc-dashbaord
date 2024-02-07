@@ -10,42 +10,38 @@ import re
 import numpy as np
 import re
 import smtplib
-
 import zlib
 import zipfile
-# Import the email modules we'll need
 from email.mime.text import MIMEText
 
 
 from openpyxl import load_workbook
 
 
-
-
 def compress(file_paths):
-    print("File Paths:")
-    print(file_paths)
+	print("File Paths:")
+	print(file_paths)
 
-    # path = "C:/data/"
+	# path = "C:/data/"
 
-    # Select the compression mode ZIP_DEFLATED for compression
-    # or zipfile.ZIP_STORED to just store the file
-    compression = zipfile.ZIP_DEFLATED
-    zip_path = "./dashboard_zip.zip"
-    # create the zip file first parameter path/name, second mode
-    zf = zipfile.ZipFile("./dashboard_zip.zip", mode="w")
-    try:
-        for file_path in file_paths:
-            # Add file to the zip file
-            # first parameter file to zip, second filename in zip
-            zf.write(file_path, file_path, compress_type=compression)
+	# Select the compression mode ZIP_DEFLATED for compression
+	# or zipfile.ZIP_STORED to just store the file
+	compression = zipfile.ZIP_DEFLATED
+	zip_path = "./dashboard_zip.zip"
+	# create the zip file first parameter path/name, second mode
+	zf = zipfile.ZipFile("./dashboard_zip.zip", mode="w")
+	try:
+		for file_path in file_paths:
+			# Add file to the zip file
+			# first parameter file to zip, second filename in zip
+			zf.write(file_path, file_path, compress_type=compression)
 
-    except FileNotFoundError:
-        print("An error occurred")
-    finally:
-        # Don't forget to close the file!
-        zf.close()
-    return zip_path
+	except FileNotFoundError:
+		print("An error occurred")
+	finally:
+		# Don't forget to close the file!
+		zf.close()
+	return zip_path
 
 # with st.echo():
 st.markdown("[![Click me](./app/static/logo-2018-small.jpg)](https://www.second-opinions.org/home)")
@@ -54,9 +50,6 @@ def clear_sheet(sheet):
 	for row in sheet:
 		sheet.delete_rows(1, sheet.max_row+1)
 	return sheet
-
-
-
 
 
 def copy_paste_cleaned_data(wb, target_sheet_name, source_sheet, reporting_year):
@@ -177,7 +170,7 @@ def clean_data(wb, data_sheet_name):
 							"% Black or African American",
 							"% Asian",
 							"% American Indian or Alaskan Native",
-							"%  Native Hawaiian or Pacific Islander",
+							"% Native Hawaiian or Pacific Islander",
 							"% Multi-racial or Bi-Racial",
 							"% Other",
 							"% Unknown",   
@@ -231,6 +224,7 @@ def update_clinic_dashbaords(dest,updated_dest, clinic_name, reporting_year):
 	wb = load_workbook(filename = dest)
 	#Get the current Active Sheet
 	ws = wb['0. Dashboard']
+
 	#You can also select a particular sheet
 	#based on sheet name
 	#ws = wb.get_sheet_by_name("Sheet1")
@@ -238,7 +232,6 @@ def update_clinic_dashbaords(dest,updated_dest, clinic_name, reporting_year):
 	ws['I12'] = reporting_year 
 	ws['R12'] = clinic_name
 	wb.save(updated_dest)
-
 
 def check_password():
 	"""Returns `True` if the user had the correct password."""
@@ -272,7 +265,6 @@ def check_password():
 def copy_paste_conversions(target_wb, source_sheet):
 	reimbursment_sheet = target_wb['1. Reimbursement Value']
 	ed_sheet = target_wb['3. Diverted ED Health']
-	print("The value at D5 is  "+ str(source_sheet['D5'].value))
 	reimbursment_sheet['C29'] = source_sheet['D5'].value
 	reimbursment_sheet['C30'] = source_sheet['D6'].value	
 	reimbursment_sheet['C31'] = source_sheet['D7'].value
@@ -285,8 +277,6 @@ def copy_paste_conversions(target_wb, source_sheet):
 	reimbursment_sheet['C43'] = source_sheet['D19'].value
 	reimbursment_sheet['C45'] = source_sheet['D21'].value
 	reimbursment_sheet['C47'] = source_sheet['D23'].value
-
-
 	ed_sheet['D23'] = source_sheet['D27'].value
 	ed_sheet['D28'] = source_sheet['D32'].value
 	ed_sheet['D30'] = source_sheet['D34'].value
@@ -300,7 +290,7 @@ def click_button():
 
 if check_password():
 	if 'button' not in st.session_state:
-	    st.session_state.button = False
+		st.session_state.button = False
 
 	conversion_template_file_path = "./static/fcc-dashboard-conversion-template.xlsx"
 	st.subheader('You can use default conversion rates or upload your own custom conversions.')
@@ -311,10 +301,10 @@ if check_password():
 	st.button('Toggle Custom Conversion', on_click=click_button)
 
 	if st.session_state.button:
-	    # The message and nested widget will remain on the page
-	    st.write('Custom conversion on')
+		# The message and nested widget will remain on the page
+		st.write('Custom conversion on')
 	else:
-	    st.write('Custom conversion off')
+		st.write('Custom conversion off')
 	dest = "./static/2022-IAFCC-Master-Dashboard-source.xlsx"
 	default_conversion_path = "./static/fcc-dashboard-default-conversions.xlsx"
 	updated_dest = "./static/Overall-Clinic-Dashboard.xlsx"
@@ -346,7 +336,7 @@ if check_password():
 			clinic_list = pull_clinic_list(wb['Cleaned Responses'], reporting_year)
 			# wb['Raw Model Inputs'].delete_columns(1,1)
 			mr = wb['Raw Model Inputs'].max_row
-			# remove unneccesary rwos
+			# remove unneccesary rows
 			# add in appropriate data from uploaded sheet
 			# for loop must go in reverse to prevent skipping rows in excel (as index moves when you remove rows)
 			for i in range(1000,-1,-1):
@@ -357,21 +347,9 @@ if check_password():
 					wb['Raw Model Inputs'].cell(row = i+2, column = 2).value = reporting_year
 				else: 
 					wb['Raw Model Inputs'].delete_rows(idx=i+2)
-
-
-			# for i in range(10000,1):
-			# 	print("the max row is :" + str(mr))
-			# 	# print(wb['Raw Model Inputs'])
-			# 	# print(wb['Raw Model Inputs'][1])
-			# 	if wb['Raw Model Inputs'].cell(row = i+1, column = 1).value == 'remove':
-			# 		print(i)
 					
-
 			wb['0. Dashboard']["I12"].value = reporting_year
 			wb.save(updated_dest)
-			# with open(updated_dest, 'rb') as f:
-			# 	st.text("Overall Dashboard")
-			# 	st.download_button('Download File', f, file_name='test.xlsx')  # Defaults to 'application/octet-stream'
 
 			file_paths = [updated_dest]
 			for clinic in clinic_list:
@@ -392,84 +370,3 @@ if check_password():
 					st.text(str(clinic_name))
 					st.download_button('Download', f, file_name= str(dashboard_name))  # Defaults to 'application/octet-stream'
 
-
-	# # Open a plain text file for reading.  For this example, assume that
-	# # the text file contains only ASCII characters.
-	# gmail_user = 'fccdashboardserver@gmail.com'
-	# gmail_password = 'FCCDashbord12345!'
-
-	# sent_from = gmail_user
-	# to = ['alansoetikno@gmail.com']
-	# subject = 'Lorem ipsum dolor sit amet'
-	# body = 'consectetur adipiscing elit'
-
-	# email_text = """\
-	# From: %s
-	# To: %s
-	# Subject: %s
-
-	# %s
-	# """ % (sent_from, ", ".join(to), subject, body)
-
-	# try:
-	# 	smtp_server = smtplib.SMTP_SSL('smtp.gmail.com', 465)
-	# 	smtp_server.ehlo()
-	# 	smtp_server.login(gmail_user, gmail_password)
-	# 	smtp_server.sendmail(sent_from, to, email_text)
-	# 	smtp_server.close()
-	# 	print ("Email sent successfully!")
-	# except Exception as ex:
-	# 	print ("Something went wrong….",ex)
-
-
-
-
-
-
-# st.write(
-#   f'<span style="font-size: 78px; line-height: 1">🐱</span>',
-#   unsafe_allow_html=True,
-# )
-
-# """
-# # Static file serving
-# """
-
-# st.caption(
-#   "[Code for this demo](https://github.com/streamlit/static-file-serving-demo/blob/main/streamlit_app.py)"
-# )
-
-# """
-# Streamlit 1.18 allows you to serve small, static media files via URL. 
-
-# ## Instructions
-
-# - Create a folder `static` in your app's root directory.
-# - Place your files in the `static` folder.
-# - Add the following to your `config.toml` file:
-
-# ```toml
-# [server]
-# enableStaticServing = true
-# ```
-
-# You can then access the files on `<your-app-url>/app/static/<filename>`. Read more in our 
-# [docs](https://docs.streamlit.io/library/advanced-features/static-file-serving).
-
-# ## Examples
-
-# You can use this feature with `st.markdown` to put a link on an image:
-# """
-
-# with st.echo():
-# st.markdown("[![Click me](./app/static/cat.jpg)](https://streamlit.io)")
-
-# """
-# Or you can use images in HTML or SVG:
-# """
-
-# with st.echo():
-#   st.markdown(
-#	  '<img src="./app/static/dog.jpg" height="333" style="border: 5px solid orange">',
-#	  unsafe_allow_html=True,
-#   )
