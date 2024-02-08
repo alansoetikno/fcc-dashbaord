@@ -199,7 +199,7 @@ def clean_data(wb, data_sheet_name):
 	mc = ws.max_column
 
 	for col in numerical_col_list:
-		col_index = column_headers.index(col.strip()) +1
+		col_index = column_headers.index(col.strip()) + 2
 		print("The column was: " + col)
 
 		convert_empty_to_zero(ws,col_index)
