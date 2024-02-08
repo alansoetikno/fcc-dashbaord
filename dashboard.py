@@ -87,9 +87,12 @@ def copy_paste_cleaned_data(wb, target_sheet_name, source_sheet, reporting_year)
 def convert_empty_to_zero(sheet, col):
 	print(sheet.cell(row = 1, column = col).value)
 	mr = sheet.max_row
+
 	#start at row 2 to skip headers
 	for i in range(2, mr + 1):  # Include mr in the range
 		cell_value = sheet.cell(row=i, column=col).value
+
+		print("the value was : " + str(cell_value))
 		if isinstance(cell_value, str):
 			# Trim and convert to lowercase for uniformity
 			trimmed_value = cell_value.lower().strip()
@@ -193,6 +196,8 @@ def clean_data(wb, data_sheet_name):
 
 	for col in numerical_col_list:
 		col_index = column_headers.index(col.strip()) + 1
+		print("The column was: " + col)
+		print("The column from the list was: "  + column_headers[col_index])
 		convert_empty_to_zero(ws,col_index)
 		find_numbers(ws, col_index)
 	return wb
@@ -221,7 +226,6 @@ def pull_clinic_list(raw_input_sheet, reporting_year):
 		# Add the value to the list
 			clinic_list.append(clinic_name)
 			print(clinic_name)
-
 	return clinic_list
 
 def update_clinic_dashbaords(dest,updated_dest, clinic_name, reporting_year):
