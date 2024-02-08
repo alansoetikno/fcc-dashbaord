@@ -85,7 +85,7 @@ def copy_paste_cleaned_data(wb, target_sheet_name, source_sheet, reporting_year)
 	return wb
 
 def convert_empty_to_zero(sheet, col):
-	print(sheet.cell(row = 1, column = col).value)
+	print("column received was " + str( sheet.cell(row = 1, column = col).value) )
 	mr = sheet.max_row
 
 	#start at row 2 to skip headers
@@ -97,7 +97,7 @@ def convert_empty_to_zero(sheet, col):
 			# Trim and convert to lowercase for uniformity
 			trimmed_value = cell_value.lower().strip()
 			# Check if the string is "-" or "n/a"
-			if trimmed_value in ["-", "n/a"]:
+			if trimmed_value in ["-", "n/a","None"]:
 				sheet.cell(row=i, column=col).value = 0
 				print("Got here")
 				print("removed " + str(trimmed_value))
@@ -199,9 +199,9 @@ def clean_data(wb, data_sheet_name):
 	mc = ws.max_column
 
 	for col in numerical_col_list:
-		col_index = column_headers.index(col.strip()) 
+		col_index = column_headers.index(col.strip()) +1
 		print("The column was: " + col)
-		print("The column from the list was: "  + column_headers[col_index])
+
 		convert_empty_to_zero(ws,col_index)
 		find_numbers(ws, col_index)
 	return wb
