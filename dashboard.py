@@ -88,15 +88,20 @@ def convert_empty_to_zero(sheet, col):
 	print(sheet.cell(row = 1, column = col).value)
 	mr = sheet.max_row
 	#start at row 2 to skip headers
-	for i in range(2, mr):
-		if isinstance(sheet.cell(row = i, column = col).value, str) == True: 
-			if sheet.cell(row = i, column = col).value== "-":
-				sheet.cell(row = i, column = col).value = 0
-			if str(sheet.cell(row = i, column = col).value).lower().strip() == "n/a":
-				sheet.cell(row = i, column = col).value = 0
-		if sheet.cell(row = i, column = col).value == None:
+	for i in range(2, mr + 1):  # Include mr in the range
+		cell_value = sheet.cell(row=i, column=col).value
+		if isinstance(cell_value, str):
+			# Trim and convert to lowercase for uniformity
+			trimmed_value = cell_value.lower().strip()
+			# Check if the string is "-" or "n/a"
+			if trimmed_value in ["-", "n/a"]:
+				sheet.cell(row=i, column=col).value = 0
+			# Check if the string contains no numbers
+			elif not any(char.isdigit() for char in trimmed_value):
+				sheet.cell(row=i, column=col).value = 0
+		elif cell_value is None:
 			continue
-			
+
 
 	return sheet
 
@@ -104,7 +109,7 @@ def convert_empty_to_zero(sheet, col):
 # for example: "Approximately 150" -> should be replaced with 150
 #		 "Zero (0)" -> should be replaced with 0 
 #		 "828 - DENTAL Imaging Only" -> replaced with 828
-#        "-" -> replaced with 0 
+#		"-" -> replaced with 0 
 def find_numbers(sheet, col):
 
 	mr = sheet.max_row
