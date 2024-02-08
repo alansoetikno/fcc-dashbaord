@@ -99,9 +99,13 @@ def convert_empty_to_zero(sheet, col):
 			# Check if the string is "-" or "n/a"
 			if trimmed_value in ["-", "n/a"]:
 				sheet.cell(row=i, column=col).value = 0
+				print("Got here")
+				print("removed " + str(trimmed_value))
 			# Check if the string contains no numbers
 			elif not any(char.isdigit() for char in trimmed_value):
 				sheet.cell(row=i, column=col).value = 0
+				print("Got here")
+				print("removed " + str(trimmed_value))
 		elif cell_value is None:
 			continue
 
@@ -195,7 +199,7 @@ def clean_data(wb, data_sheet_name):
 	mc = ws.max_column
 
 	for col in numerical_col_list:
-		col_index = column_headers.index(col.strip()) + 1
+		col_index = column_headers.index(col.strip()) 
 		print("The column was: " + col)
 		print("The column from the list was: "  + column_headers[col_index])
 		convert_empty_to_zero(ws,col_index)
