@@ -17,6 +17,22 @@ from email.mime.text import MIMEText
 
 from openpyxl import load_workbook
 
+def delete_rows_by_clinic_name(wb, sheet_name, clinic_name_variable):
+	# Load the workbook and select the specified sheet
+	sheet = wb[sheet_name]
+
+	# Get the total number of rows
+	max_row = sheet.max_row
+
+	# Iterate through each row in reverse order
+	for row in range(max_row, 0, -1):
+		# Check if the value in the first column matches the clinic_name_variable
+		if sheet.cell(row=row, column=1).value != clinic_name_variable:
+			# Delete the row if it does not match
+			sheet.delete_rows(row)
+
+	# Save the workbook
+	return wb
 
 def compress(file_paths):
 	print("File Paths:")
@@ -84,14 +100,16 @@ def copy_paste_cleaned_data(wb, target_sheet_name, source_sheet, reporting_year)
 			target_sheet.cell(row = i, column = 2).value = reporting_year
 	return wb
 
+
+
+
+
 def convert_empty_to_zero(sheet, col):
 	print("column received was " + str( sheet.cell(row = 1, column = col).value) )
 	mr = sheet.max_row
-
 	#start at row 2 to skip headers
 	for i in range(2, mr + 1):  # Include mr in the range
 		cell_value = sheet.cell(row=i, column=col).value
-
 		print("the value was : " + str(cell_value))
 		if isinstance(cell_value, str):
 			# Trim and convert to lowercase for uniformity
@@ -99,13 +117,9 @@ def convert_empty_to_zero(sheet, col):
 			# Check if the string is "-" or "n/a"
 			if trimmed_value in ["-", "n/a","None"]:
 				sheet.cell(row=i, column=col).value = 0
-				print("Got here")
-				print("removed " + str(trimmed_value))
 			# Check if the string contains no numbers
 			elif not any(char.isdigit() for char in trimmed_value):
 				sheet.cell(row=i, column=col).value = 0
-				print("Got here")
-				print("removed " + str(trimmed_value))
 		elif cell_value is None:
 			continue
 
@@ -244,6 +258,8 @@ def update_clinic_dashbaords(dest,updated_dest, clinic_name, reporting_year):
 	#Open the csv file
 	ws['I12'] = reporting_year 
 	ws['R12'] = clinic_name
+	wb = delete_rows_by_clinic_name(wb, "Raw Model Inputs", clinic_name)
+	wb = delete_rows_by_clinic_name(wb, "Cleaned Responses", str(clinic_name) + str(reporting_year))
 	wb.save(updated_dest)
 
 def check_password():
