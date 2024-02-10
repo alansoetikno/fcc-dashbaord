@@ -111,7 +111,7 @@ def check_perc_col(sheet,col):
 	for i in range(2, mr + 1):  # Include mr in the range
 		cell_value = sheet.cell(row=i, column=col).value
 		if isinstance(cell_value, (int, float)):
-			if not 0 <= cell_value <= 1:
+			if not 0 <= cell_value <= 100:
 				sheet.cell(row=i, column=col).value = 0 
 			else:
 				pass
