@@ -110,7 +110,7 @@ def check_perc_col(sheet,col):
 	#start at row 2 to skip headers
 	for i in range(2, mr + 1):  # Include mr in the range
 		cell_value = sheet.cell(row=i, column=col).value
-		if 0 > cell_value  or cell_value > 1:
+		if not 0 <= cell_value <= 1:
 			sheet.cell(row=i, column=col).value = 0 
 		else:
 			continue
