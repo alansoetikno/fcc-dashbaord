@@ -121,12 +121,10 @@ def check_perc_col(sheet,col):
 	return sheet
 
 def convert_empty_to_zero(sheet, col):
-	print("column received was " + str( sheet.cell(row = 1, column = col).value) )
 	mr = sheet.max_row
 	#start at row 2 to skip headers
 	for i in range(2, mr + 1):  # Include mr in the range
 		cell_value = sheet.cell(row=i, column=col).value
-		print("the value was : " + str(cell_value))
 		if isinstance(cell_value, str):
 			# Trim and convert to lowercase for uniformity
 			trimmed_value = cell_value.lower().strip()
@@ -262,13 +260,10 @@ def clean_data(wb, data_sheet_name):
 	for col in column_headers_obs:
 		if col.value != None:
 			column_headers = column_headers + [col.value.strip()]
-			print(col.value)
 	mc = ws.max_column
 
 	for col in numerical_col_list:
 		col_index = column_headers.index(col.strip()) + 2
-		print("The column was: " + col)
-
 		convert_empty_to_zero(ws,col_index)
 		find_numbers(ws, col_index)
 		if col in perc_col_list:
@@ -299,7 +294,6 @@ def pull_clinic_list(raw_input_sheet, reporting_year):
 			clinic_name = row[6].value
 		# Add the value to the list
 			clinic_list.append(clinic_name)
-			print(clinic_name)
 	return clinic_list
 
 def update_clinic_dashbaords(dest,updated_dest, clinic_name, reporting_year):
@@ -421,9 +415,7 @@ if check_password():
 			# add in appropriate data from uploaded sheet
 			# for loop must go in reverse to prevent skipping rows in excel (as index moves when you remove rows)
 			for i in range(1000,-1,-1):
-
 				if i <len(clinic_list):
-					print(clinic_list[i])
 					wb['Raw Model Inputs'].cell(row = i+2, column = 1).value = clinic_list[i]
 					wb['Raw Model Inputs'].cell(row = i+2, column = 2).value = reporting_year
 				else: 
@@ -447,7 +439,6 @@ if check_password():
 				with open(file_path, 'rb') as f:
 					dashboard_name = file_path.split('/')[-1]
 					clinic_name = dashboard_name.split('.')[0]
-					print(dashboard_name)
 					st.text(str(clinic_name))
 					st.download_button('Download', f, file_name= str(dashboard_name))  # Defaults to 'application/octet-stream'
 
