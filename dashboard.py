@@ -25,7 +25,7 @@ def delete_rows_by_clinic_name(wb, sheet_name, clinic_name_variable):
 	max_row = sheet.max_row
 
 	# Iterate through each row in reverse order
-	for row in range(max_row, 0, -1):
+	for row in range(max_row, 1, -1):
 		# Check if the value in the first column matches the clinic_name_variable
 		if sheet.cell(row=row, column=1).value != clinic_name_variable:
 			# Delete the row if it does not match
