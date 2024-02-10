@@ -258,6 +258,7 @@ def update_clinic_dashbaords(dest,updated_dest, clinic_name, reporting_year):
 	#Open the csv file
 	ws['I12'] = reporting_year 
 	ws['R12'] = clinic_name
+	print(str(clinic_name) + str(reporting_year))
 	wb = delete_rows_by_clinic_name(wb, "Raw Model Inputs", clinic_name)
 	wb = delete_rows_by_clinic_name(wb, "Cleaned Responses", str(clinic_name) + str(reporting_year))
 	wb.save(updated_dest)
