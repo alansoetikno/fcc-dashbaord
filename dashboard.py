@@ -17,6 +17,9 @@ from email.mime.text import MIMEText
 
 from openpyxl import load_workbook
 
+
+
+
 def delete_rows_by_clinic_name(wb, sheet_name, clinic_name_variable, col):
 	# Load the workbook and select the specified sheet
 	sheet = wb[sheet_name]
@@ -101,8 +104,17 @@ def copy_paste_cleaned_data(wb, target_sheet_name, source_sheet, reporting_year)
 	return wb
 
 
-
-
+def check_perc_col(sheet,col):
+    # Check if value is between 0 and 1
+	mr = sheet.max_row
+	#start at row 2 to skip headers
+	for i in range(2, mr + 1):  # Include mr in the range
+		cell_value = sheet.cell(row=i, column=col).value
+		if 0 > cell_value  or cell_value > 1:
+			sheet.cell(row=i, column=col).value = 0 
+		else:
+			continue
+	return sheet
 
 def convert_empty_to_zero(sheet, col):
 	print("column received was " + str( sheet.cell(row = 1, column = col).value) )
@@ -203,6 +215,43 @@ def clean_data(wb, data_sheet_name):
 							"% : Below 100% of FPL",
 							"% : Between 100% and 200% of FPL",
 							"% : Over 200% of FPL"] 
+	
+	perc_col_list = [		"% Diabetes Screening/Management",
+							"% HTN Screening/Management",   
+							"% Cancer Screening/Management",
+							"% Obesity Screening/Management",   
+							"% Dental Care",
+							"% Sexual Health Screening/Management",
+							"% Dyslipidemia/Hypercholesterolemia Screening/Management", 
+							"% Mental Health Screening/management",
+							"% Influenza Immunization",  
+							"% Other Immunizations (ex: shingles, pneumonia, COVID, etc)",
+							"% Asthma/COPD Management", 
+							"% Dermatology Screening & Management", 
+							"% Heart Disease Screening & Management",
+							"% Vision Screenings and Exams",	
+							"% Arthritis/Musculoskeletal Screening/Management", 
+							"% Physicals (school, sport, or general)",
+							"% Acute Injury Management",	
+							"% Hearing Screening and Exam",
+							"% Transgender FTM (female-to-male) Patients",
+							"% Transgender MTF (male-to-female) Patients", 
+							"% Gender Non-Conforming Patients",
+							"% 0-17 years old", 
+							"% 18-64 years old",
+							"% 65+ years old",
+							"% Latino or Hispanic",
+							"% White",
+							"% Black or African American",
+							"% Asian",
+							"% American Indian or Alaskan Native",
+							"% Native Hawaiian or Pacific Islander",
+							"% Multi-racial or Bi-Racial",
+							"% Other",
+							"% Unknown",   
+							"% : Below 100% of FPL",
+							"% : Between 100% and 200% of FPL",
+							"% : Over 200% of FPL"]
 	ws = wb[data_sheet_name]
 	column_headers_obs = ws[1]
 	column_headers = []
@@ -218,6 +267,9 @@ def clean_data(wb, data_sheet_name):
 
 		convert_empty_to_zero(ws,col_index)
 		find_numbers(ws, col_index)
+		if col in perc_col_list:
+			check_perc_col(ws,col_index)
+
 	return wb
 
 def data_quality_check():
@@ -312,10 +364,7 @@ def copy_paste_conversions(target_wb, source_sheet):
 	return wb
 
 def click_button():
-	st.session_state.button = not st.session_state.button
-
-
-
+	st.session_state.button = not st.session_state.button\
 
 if check_password():
 	if 'button' not in st.session_state:
