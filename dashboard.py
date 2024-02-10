@@ -17,7 +17,7 @@ from email.mime.text import MIMEText
 
 from openpyxl import load_workbook
 
-def delete_rows_by_clinic_name(wb, sheet_name, clinic_name_variable):
+def delete_rows_by_clinic_name(wb, sheet_name, clinic_name_variable, col):
 	# Load the workbook and select the specified sheet
 	sheet = wb[sheet_name]
 
@@ -27,7 +27,7 @@ def delete_rows_by_clinic_name(wb, sheet_name, clinic_name_variable):
 	# Iterate through each row in reverse order
 	for row in range(max_row, 1, -1):
 		# Check if the value in the first column matches the clinic_name_variable
-		if sheet.cell(row=row, column=1).value != clinic_name_variable:
+		if sheet.cell(row=row, column=col).value != clinic_name_variable:
 			# Delete the row if it does not match
 			sheet.delete_rows(row)
 
@@ -258,9 +258,8 @@ def update_clinic_dashbaords(dest,updated_dest, clinic_name, reporting_year):
 	#Open the csv file
 	ws['I12'] = reporting_year 
 	ws['R12'] = clinic_name
-	print(str(clinic_name) + str(reporting_year))
-	wb = delete_rows_by_clinic_name(wb, "Raw Model Inputs", clinic_name)
-	wb = delete_rows_by_clinic_name(wb, "Cleaned Responses", str(clinic_name) + str(reporting_year))
+	wb = delete_rows_by_clinic_name(wb, "Raw Model Inputs", clinic_name, col = 1)
+	wb = delete_rows_by_clinic_name(wb, "Cleaned Responses", clinic_name, col = 7)
 	wb.save(updated_dest)
 
 def check_password():
