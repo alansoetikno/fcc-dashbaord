@@ -177,7 +177,7 @@ def clean_data(wb, data_sheet_name):
 							"Number of In-House Imaging Tests in past year",	
 							"Number of In-House Lab Tests in past year",
 							"Number of In-House COVID Tests in past year",
-							"Number of COVID Vaccinations in past year provided  in your clinic by an outside organization (e.g. the state or local public health department or a private provider)",
+							"Number of COVID Vaccinations in past year provided in your clinic by an outside organization (e.g. the state or local public health department or a private provider)",
 							"Number of COVID Vaccinations in past year provided independently by your clinic (vaccines administered by clinic personnel, not by an outside organization)",
 							"% Diabetes Screening/Management",
 							"% HTN Screening/Management",   
@@ -386,7 +386,7 @@ if check_password():
 
 	st.text("")
 	spectra = st.file_uploader("Upload your clinic's data here! (*max 1000 clinics*)", type={"csv", "xlsx"})
-	reporting_year = 2022
+	reporting_year = 2023
 	if spectra is not None:
 		
 		if st.session_state.button:
@@ -424,6 +424,7 @@ if check_password():
 
 			file_paths = [updated_dest]
 			for clinic in clinic_list:
+				print(clinic)
 				final_path = dashboard_folder_path + str(reporting_year) + "-" + clinic + " dashboard.xlsx"
 				file_paths = file_paths + [final_path]
 				update_clinic_dashbaords(updated_dest, final_path, clinic, reporting_year)
